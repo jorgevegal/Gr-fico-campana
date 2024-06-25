@@ -1,0 +1,79 @@
+#### REMOVER OBJETOS EXISTENTES ####
+cat("\014") 
+rm(list = ls()
+)
+
+#### CARGAR PAQUETES #####
+library(ggplot2)
+library(ggpubr)
+library(tidyverse)
+library(cowplot)
+library(grid)
+library(gridExtra)
+library(sf)
+library(readxl)
+library(dplyr)
+library(ggrepel)
+library(simputation)
+
+#### DEFINIR DIRECTORIO ####
+getwd() # consultar directorio de trabajo
+setwd("C:/Users/JVEGAL/Desktop/BASES CONASET") # definir directorio
+
+#### CARGAS BASES DE DATOS ####
+motociclistas23 <- read_excel("motociclistas23.xlsx")
+
+## OPCIÓN GRÁFICO DE BARRAS
+
+grafico1 <- motociclistas23 %>%
+  mutate(Edad = as.numeric(Edad)) %>%
+  ggplot(aes(Edad,fill=Sexo)) +
+  geom_histogram(stat = "count") +
+  scale_fill_manual(values=  c("#00AFBB", "#E7B800"))+
+  theme_bw() +
+  labs(y = "Participantes", x = "Edad")+
+  facet_grid(Sexo~.)
+
+grafico1 <- grid.arrange(grafico1,
+                         bottom = textGrob(
+                           "n = 6.805",
+                           x = .98,
+                           hjust = 1,
+                           gp = gpar(fontface = "italic", fontsize = 9) 
+                         ))#utilizamos la funcion grid.arrange para agregar texto en la grafica
+
+_______________________________________________________________________
+## OPCIÓN GRÁFICO DE CAMPANA
+
+#### DEFINIR DIRECTORIO ####
+getwd() # consultar directorio de trabajo
+setwd("C:/Users/JVEGAL/Desktop/BASES CONASET") # definir directorio
+
+#### CARGAS BASES DE DATOS ####
+perveh2023 <- read_excel("perveh23.xlsx")
+
+### FILTRAR POR FALLECIDOS ####
+
+perveh2023 <- filter(perveh2023, Resultado == 1)
+
+#### GRAFICO FALLECIDOS POR EDAD Y SEXO #####
+
+grafico3 <- perveh2023  %>%
+  mutate(Edad=as.numeric(Edad))%>%
+  ggplot(aes(x=Sexo,y=Edad)) +
+  geom_violin(scale = "count",aes(fill=Sexo))+
+  scale_fill_manual(values=c("#00AFBB", "#E7B800"))+
+  theme_bw() +
+  labs(y = "Edad",x="", title="Fallecidos en siniestros de transito segun sexo y grupo etario (Chile 2023)")+
+  theme(legend.position = "top",
+        legend.title = element_blank())
+
+
+grafico3 <- grid.arrange(grafico3,
+                         bottom = textGrob(
+                           "n = 1.635
+                           Fuente: Carabineros de Chile - Elaboracion: CONASET",
+                           x = .98,
+                           hjust = 1,
+                           gp = gpar(fontface = "italic", fontsize = 9)
+                         )) #utilizamos la funcion grid.arrange para agregar texto en la grafica
